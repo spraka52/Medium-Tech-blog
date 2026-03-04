@@ -147,23 +147,26 @@ If the hash key includes memory region or page-table base address, processes wit
 
 Here's how it compares across the properties that matter most:
 
-# 4. Hash Scheduling vs. Existing Algorithms
+**Deterministic?**
+FIFO ✅ | Round Robin ✅ | CFS ✅ | Lottery ❌ | Hash ✅
 
-Here’s how hash scheduling compares across key properties:
+**Starvation-free?**
+FIFO ❌ | Round Robin ✅ | CFS ✅ | Lottery ⚠️ Probabilistic | Hash ⚠️ With aging
 
-| Property | FIFO | Round Robin | CFS | Lottery | Hash |
-|-----------|------|-------------|-----|----------|------|
-| **Deterministic** | ✅ | ✅ | ✅ | ❌ | ✅ |
-| **Starvation-free** | ❌ | ✅ | ✅ | ⚠️ Probabilistic | ⚠️ With aging |
-| **O(1) dispatch** | ✅ | ✅ | ❌ O(log n) | ❌ O(n) | ⚠️ O(n) naïve / O(1) bucketed |
-| **Priority-aware** | ❌ | ⚠️ Optional | ✅ | ✅ | ✅ (via key design) |
-| **Cache-locality aware** | ❌ | ❌ | ⚠️ Domain hints | ❌ | ✅ (via key design) |
-| **Reproducible trace** | ✅ | ✅ | ✅ | ❌ | ✅ |
-| **Manipulation-resistant** | ❌ | ❌ | ⚠️ Partial | ⚠️ Partial | ✅ (crypto hash option) |
+**O(1) dispatch?**
+FIFO ✅ | Round Robin ✅ | CFS ❌ O(log n) | Lottery ❌ O(n) | Hash ⚠️ O(n) naïve / O(1) bucketed
 
-**Legend:**  
+**Priority-aware?**
+FIFO ❌ | Round Robin ⚠️ Optional | CFS ✅ | Lottery ✅ | Hash ✅ Via key design
 
-✅ Yes · ❌ No · ⚠️ Depends / partial / probabilistic
+**Cache-locality-aware?**
+FIFO ❌ | Round Robin ❌ | CFS ⚠️ Domain hints | Lottery ❌ | Hash ✅ Via key design
+
+**Reproducible trace?**
+FIFO ✅ | Round Robin ✅ | CFS ✅ | Lottery ❌ | Hash ✅
+
+**Manipulation-resistant?**
+FIFO ❌ | Round Robin ❌ | CFS ❌ Partial | Lottery ⚠️ Partial | Hash ✅ Strong (cryptographic hash)
 
 The standout property: **composability**. Hash scheduling doesn't commit to a single optimization objective — you tune the key, and the policy follows. No existing algorithm offers this degree of structural flexibility at the dispatch layer.
 
